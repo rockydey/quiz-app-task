@@ -1,9 +1,7 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
 ## Getting Started
 
-Set .env
-## Env File
+1. Set .env
+# Env File
 ```bash
 AUTH_SECRET="cFI2+xO9Uny+1Jb8ErhAB493xAiOrbpOSoEest0pKjE=" # Added by `npx auth`. Read more: https://cli.authjs.dev
 
