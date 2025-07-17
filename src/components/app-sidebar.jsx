@@ -157,9 +157,7 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }) {
-  const user = useCurrentUser();
-
+export function AppSidebar({ user, ...props }) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
