@@ -28,4 +28,4 @@ pnpm dev
 bun dev
 ```
 
-## 3. Credential Registration: Email verification link is in console.
+## 3. Credential Registration: Verification link is available in console.
