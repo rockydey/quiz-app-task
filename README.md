@@ -28,4 +28,4 @@ pnpm dev
 bun dev
 ```
 
-## 3. After Credential Registration, Please check the verification link in console.
+## 3. Credential Registration: Email verification link is in console.
