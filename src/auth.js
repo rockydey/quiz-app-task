@@ -31,8 +31,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       const existingUser = await getUserById(user.id);
 
-      // Prevent sign in without email verification
-      if (!existingUser?.emailVerified) return false;
+      // Prevent sign in without email verification unless disabled via env
+      const requireVerification =
+        process.env.NEXT_PUBLIC_REQUIRE_EMAIL_VERIFICATION === "true" ||
+        process.env.NODE_ENV === "production";
+      if (requireVerification && !existingUser?.emailVerified) return false;
 
       return true;
     },
@@ -44,6 +47,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.name = token.name;
         session.user.email = token.email;
+        session.user.role = token.role;
       }
 
       return session;
@@ -60,6 +64,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       token.isOAuth = !!existingAccount;
       token.name = existingUser.name;
       token.email = existingUser.email;
+      token.role = existingUser.role;
 
       return token;
     },

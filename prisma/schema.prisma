@@ -12,6 +12,11 @@ enum QuestionType {
   TEXT
 }
 
+enum Role {
+  ADMIN
+  CANDIDATE
+}
+
 model User {
   id            String            @id @default(uuid())
   name          String
@@ -19,6 +24,7 @@ model User {
   image         String?
   emailVerified DateTime?
   password      String?
+  role          Role              @default(CANDIDATE)
   accounts      Account[]
   assignedTests AssignedTest[]
   testSessions  UserTestSession[]
@@ -61,12 +67,19 @@ model PasswordResetToken {
   @@unique([email, token])
 }
 
+model Position {
+  id    String @id @default(uuid())
+  name  String @unique
+  tests Test[]
+}
+
 model Test {
   id            String            @id @default(uuid())
   name          String
-  position      String
   date          DateTime
   durationMin   Int
+  position      Position          @relation(fields: [positionId], references: [id])
+  positionId    String
   groups        Group[]
   assignedTests AssignedTest[]
   testSessions  UserTestSession[]
@@ -112,7 +125,6 @@ model Question {
   text          String
   type          QuestionType
   score         Int
-  correct       Int? // MCQ only
   choices       Choice[]
   userAnswers   UserAnswer[]
   testQuestions TestQuestion[]
@@ -132,7 +144,8 @@ model Choice {
   text       String
   question   Question @relation(fields: [questionId], references: [id])
   questionId String
-  index      Int // Unique index to match against correct answer
+  index      Int // Unique index within question
+  isCorrect  Boolean @default(false)
 }
 
 model UserAnswer {

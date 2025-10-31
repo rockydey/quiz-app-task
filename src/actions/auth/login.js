@@ -24,7 +24,11 @@ export const login = async (values, callbackUrl) => {
     return { error: "Email does not exist!" };
   }
 
-  if (!existingUser.emailVerified) {
+  const requireVerification =
+    process.env.NEXT_PUBLIC_REQUIRE_EMAIL_VERIFICATION === "true" ||
+    process.env.NODE_ENV === "production";
+
+  if (requireVerification && !existingUser.emailVerified) {
     const verificationToken = await generateVerificationToken(
       existingUser.email
     );

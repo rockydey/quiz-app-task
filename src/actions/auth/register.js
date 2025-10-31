@@ -25,16 +25,28 @@ export const register = async (values) => {
     return { error: "Email already in use!" };
   }
 
+  const requireVerification =
+    process.env.NEXT_PUBLIC_REQUIRE_EMAIL_VERIFICATION === "true" ||
+    process.env.NODE_ENV === "production";
+
   await db.user.create({
     data: {
       name,
       email,
       password: hashedPassword,
+      // In development, allow skipping email verification
+      ...(requireVerification ? {} : { emailVerified: new Date() }),
     },
   });
 
-  const verificationToken = await generateVerificationToken(email);
-  await sendVerificationEmail(verificationToken.email, verificationToken.token);
+  if (requireVerification) {
+    const verificationToken = await generateVerificationToken(email);
+    await sendVerificationEmail(
+      verificationToken.email,
+      verificationToken.token
+    );
+    return { success: "Confirmation email sent!" };
+  }
 
-  return { success: "Confirmation email sent!" };
+  return { success: "Account created!" };
 };
