@@ -159,32 +159,14 @@ const data = {
   ],
 };
 
-export function AppSidebar({ user, ...props }) {
+export function AppSidebar({ ...props }) {
   const sessionUser = useCurrentUser();
-  const isAdmin = sessionUser?.role === "ADMIN" || user?.role === "ADMIN";
-  // Admin navigation full sequence
+  const user = sessionUser;
+  const isAdmin = sessionUser?.role === "ADMIN";
+  // Admin navigation (only implemented routes)
   const adminNav = [
     { title: "Dashboard", url: "/dashboard/admin", icon: Settings2 },
-    {
-      title: "Assign User Test",
-      url: "/dashboard/admin/assign",
-      icon: Settings2,
-    },
     { title: "Positions", url: "/dashboard/admin/positions", icon: Settings2 },
-    {
-      title: "Question Groups",
-      url: "/dashboard/admin/groups",
-      icon: Settings2,
-    },
-    { title: "Questions", url: "/dashboard/admin/questions", icon: Settings2 },
-    { title: "Test Builder", url: "/dashboard/admin/quizzes", icon: Settings2 },
-    {
-      title: "User Management",
-      url: "/dashboard/admin/users",
-      icon: Settings2,
-    },
-    { title: "Grading", url: "/dashboard/admin/grading", icon: Settings2 },
-    { title: "Analytics", url: "/dashboard/admin/analytics", icon: Settings2 },
   ];
 
   // Interviewee navigation

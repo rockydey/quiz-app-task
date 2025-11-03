@@ -217,6 +217,40 @@ async function main() {
     // Third test: no session → Not Started
   }
 
+  // Additional demo: Another position and tests
+  const backendPosition = await prisma.position.upsert({
+    where: { name: "Backend Developer" },
+    update: {},
+    create: { name: "Backend Developer" },
+  });
+
+  const nodeBasics = await prisma.test.create({
+    data: {
+      name: "Node.js Basics",
+      date: new Date(),
+      durationMin: 40,
+      positionId: backendPosition.id,
+    },
+  });
+
+  // Link existing JS questions into Node test too
+  let order2 = 1;
+  for (const q of allQuizQuestions) {
+    await prisma.testQuestion
+      .create({
+        data: { testId: nodeBasics.id, questionId: q.id, order: order2++ },
+      })
+      .catch(() => {});
+  }
+
+  if (candidate) {
+    await prisma.assignedTest
+      .create({
+        data: { userId: candidate.id, testId: nodeBasics.id, assignedAt: new Date() },
+      })
+      .catch(() => {});
+  }
+
   console.log("Seed complete");
 }
 

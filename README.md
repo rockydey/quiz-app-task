@@ -28,7 +28,7 @@ Portals:
 - Admin: `http://localhost:3000/dashboard/admin`
 - Interviewee: `http://localhost:3000/dashboard/my-tests`
 
-Modern Quiz application with Auth.js (NextAuth v5), Prisma (SQLite), role‑based access (Admin/Candidate), and Shadcn UI. Sidebar provides portal switching and an admin navigation aligned with the spec from the v0 reference.
+Modern Quiz application built with Next.js 15 server actions, Auth.js (NextAuth v5), Prisma (SQLite), role‑based access (Admin/Candidate), and Shadcn UI. Sidebar provides portal switching and an admin navigation aligned with the spec from the v0 reference.
 
 ---
 
@@ -93,23 +93,20 @@ Demo tests created by seed:
 
 ## 3) Features
 
-- Auth.js v5 with Prisma adapter (JWT strategy), custom callbacks enrich `session.user` with `role`.
-- Role‑based middleware gates:
+- **Next.js 15 Server Actions**: All backend operations use server actions with Prisma
+- **Auth.js v5** with Prisma adapter (JWT strategy); `session.user` includes `role`
+- **RBAC** via middleware:
   - Public: `/`, `/auth/*`, `/api/auth/*`
-  - Candidate area: `/dashboard`
-  - Admin area: `/dashboard/admin`
-- Sidebar layout (Shadcn UI) with portal switcher:
-  - Admin → “Interviewee Portal” button; Candidate → “Admin Portal” button
-- Admin navigation (routes created):
-  1. `/dashboard/admin` (Dashboard/Positions overview)
-  2. `/dashboard/admin/assign`
-  3. `/dashboard/admin/positions`
-  4. `/dashboard/admin/groups`
-  5. `/dashboard/admin/questions`
-  6. `/dashboard/admin/quizzes` (Test Builder)
-  7. `/dashboard/admin/users`
-  8. `/dashboard/admin/grading`
-  9. `/dashboard/admin/analytics`
+  - Candidate: `/dashboard`
+  - Admin: `/dashboard/admin`
+- **Admin flows implemented**
+  - Positions: create/list (`/dashboard/admin`, `/dashboard/admin/positions`)
+  - Quizzes (per Position): create/list with duration/date (`/dashboard/admin/positions/[positionId]/quizzes`)
+  - Groups (per Quiz): create/list (`/dashboard/admin/quizzes/[testId]/groups`)
+  - Questions (per Group): create MCQ/Text, mark correct options (`/dashboard/admin/groups/[groupId]/questions`)
+- **Candidate flow implemented**
+  - My Tests list with status and progress (`/dashboard/my-tests`)
+  - Test taking UI with countdown and auto‑submit (`/dashboard/my-tests/[testId]`)
 
 Interviewee navigation:
 
@@ -119,38 +116,34 @@ Interviewee navigation:
 
 ## 4) Important code locations
 
-- Auth config and server instance: `src/auth.config.js`, `src/auth.js`
-- Middleware (RBAC + redirects): `src/middleware.js`
-- Routes constants: `src/routes.js`
-- Sidebar + navigation: `src/components/app-sidebar.jsx`, `src/components/nav-main.jsx`
-- Dashboard layout shell (sidebar wrapper): `src/app/dashboard/layout.jsx`
-- Interviewee pages: `src/app/dashboard/my-tests`, `src/app/dashboard/my-tests/[testId]`
-- Prisma schema/models: `prisma/schema.prisma`
-- Seed data: `prisma/seed.js`
+- **Server Actions**: `src/actions/`
+  - Auth: `src/actions/auth/`
+  - Admin: `src/actions/admin/`
+  - Interviewee: `src/actions/interviewee/`
+- **Test runtime actions**: `src/actions/interviewee/test.js` (start/save/submit)
+- **Auth config**: `src/auth.config.js`, `src/auth.js`
+- **Middleware**: `src/middleware.js`
+- **Sidebar**: `src/components/app-sidebar.jsx`
+- **Prisma schema/models**: `prisma/schema.prisma`
+- **Seed data**: `prisma/seed.js`
 
 ---
 
-## 5) Admin module – Positions (example)
+## 5) Admin module – Positions
 
-- The `/dashboard/admin` page lists Positions and lets you create a Position using server actions backed by Prisma.
-- Source: `src/app/dashboard/admin/page.jsx` and `src/actions/admin/position.js`
-
----
-
-## 6) Optional backend scaffold (NestJS)
-
-An optional `backend/` NestJS scaffold exists but is not required to run the app. The app defaults to server actions. If you wish to use the Nest API later, start it on port `4000` and point the frontend API utility to it via `NEXT_PUBLIC_API_BASE_URL`.
+- `/dashboard/admin` lists Positions and lets you create a Position using server actions (Prisma).
+- Source: `src/app/dashboard/admin/page.jsx`, `src/actions/admin/position.js`
 
 ---
 
-## 7) Troubleshooting
+## 6) Troubleshooting
 
 - Cannot access admin pages:
   - Ensure you’re logged in as the seeded admin (`admin@test.com`).
   - Verify `role: "ADMIN"` in the `User` table.
   - Clear cookies and re‑login if the session was created before recent changes.
-- “fetch failed” on admin page:
-  - The app uses server actions by default; ensure you reverted any temporary API fetch wiring.
+- "fetch failed" on admin page:
+  - The app uses Next.js server actions; ensure Prisma client is generated and the SQLite file path is valid.
 - OAuth errors:
   - Providers are loaded only if env vars exist; unset them to disable.
 - No tests on Interviewee “My Tests”:
@@ -158,7 +151,7 @@ An optional `backend/` NestJS scaffold exists but is not required to run the app
 
 ---
 
-## 8) Scripts
+## 7) Scripts
 
 ```bash
 # Dev
@@ -175,7 +168,7 @@ npm run lint
 
 ---
 
-## 9) Notes
+## 8) Notes
 
 - Email verification is disabled in development by default (`NEXT_PUBLIC_REQUIRE_EMAIL_VERIFICATION=false`).
 - Update `app/layout.js` metadata (title/description) to match your project.

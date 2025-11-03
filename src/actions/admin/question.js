@@ -30,6 +30,19 @@ export const createQuestion = async ({
       },
       include: { choices: true },
     });
+
+    // Also insert into TestQuestion for ordering
+    const group = await db.group.findUnique({ where: { id: groupId } });
+    if (group?.testId) {
+      const last = await db.testQuestion.findFirst({
+        where: { testId: group.testId },
+        orderBy: { order: "desc" },
+      });
+      const nextOrder = (last?.order || 0) + 1;
+      await db.testQuestion.create({
+        data: { testId: group.testId, questionId: question.id, order: nextOrder },
+      }).catch(() => {});
+    }
     return { success: "Question created", question };
   } catch {
     return { error: "Failed to create question" };
